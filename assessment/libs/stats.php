@@ -452,7 +452,6 @@ function freqdist($a,$label,$start,$cw) {
 	$eps = $cw/1e8;
 	$out = "<table class=stats><thead><tr><th>$label</th><th>Freq</th></tr></thead>\n<tbody>\n";
 	while ($x < $a[count($a)-1]+$eps) {
-	while ($x < $a[count($a)-1]+$eps) {
 		$out .= "<tr><td>`$x <= x < ";
 		$x += $cw;
 		$out .= "$x`</td><td>";
@@ -565,7 +564,6 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 		$dxdiff = $cw-$dx;
 	}
     $st = '';
-	while ($x < $a[count($a)-1]+$eps) {
 	while ($x < $a[count($a)-1]+$eps) {
 		$alt .= "<tr><td>$x</td>";
 		$st .= "rect([$x,0],";
