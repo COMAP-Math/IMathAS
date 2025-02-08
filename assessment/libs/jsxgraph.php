@@ -84,32 +84,32 @@ function jsxObject (&$board, $param, $ops=array()) {
 	if (!$inputerror) {
 
 		// Set default values
-		
+
 
 		// Begin object creation
 
 		$out = "window.{$id} = board_{$boardID}.create('object', [";
-		
 
 
-		// Set attributes 
-		
+
+		// Set attributes
+
 		$out .= "{
 
 		})";
-		
-		if (!empty($ops['attributes'])) { 
+
+		if (!empty($ops['attributes'])) {
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
 		}
-		
+
 		$out .= jsx_setlabel($id, $label);
-		
+
 		// Append new output string to the board string
 		$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"), 0);
 		return $id;
-		
+
 	} else {
 		echo "error message";
 	}
@@ -148,7 +148,7 @@ function jsxSlider (&$board, $param, $ops=array()) {
 	$nSliders = jsx_getslidercount($board) + 1;
 
 	// $param - [min, max, step, default]
-	
+
 	if (!is_array($param) || !(count($param) == 3 || count($param) == 4)) {
 		echo "Eek! jsxSlider requires an array with three or four inputs: [min, max, step, <i>defaultval</i>]";
 	} else {
@@ -157,11 +157,11 @@ function jsxSlider (&$board, $param, $ops=array()) {
 		$max = is_numeric($param[1]) ? $param[1] : 10;
 		$step = is_numeric($param[2]) ? $param[2] : 1;
 		$defaultval = isset($param[3]) ? $param[3] : ($min + $max) / 2;
-		
+
 		// Parameters:
 		//  label, color, default value, showLabel, LabelSize, decimals, position,
 		//  answerbox
-	
+
 		$haslabel = !empty($ops['label']) ? 'true' : 'false';
 		$label = !empty($ops['label']) ? $ops['label'] : '';
 		$color = !empty($ops['color']) ? $ops['color'] : 'purple';
@@ -170,38 +170,38 @@ function jsxSlider (&$board, $param, $ops=array()) {
 		$fontcolor = !empty($ops['fontcolor']) ? $ops['fontcolor'] : $color;
 		$name = !empty($ops['name']) ? $ops['name'] : '';
 		$decimals = !empty($ops['decimals']) ? $ops['decimals'] : 0;
-		
+
 		if (!isset($ops['position'])) {
-			
+
 			$relpos = true;
 			$x1 = 0.05;
 			$y1 = 0.05 * $nSliders;
 			$x2 = 0.25;
 			$y2 = 0.05 * $nSliders;
-			
+
 		} else {
-			
+
 			$relpos = false;
 			$x1 = isset($ops['position'][0][0]) ? $ops['position'][0][0] : 1;
 			$y1 = isset($ops['position'][0][1]) ? $ops['position'][0][1] : 1 * $nSliders;
 			$x2 = isset($ops['position'][1][0]) ? $ops['position'][1][0] : 5;
 			$y2 = isset($ops['position'][1][1]) ? $ops['position'][1][1] : 1 * $nSliders;
-			
+
 		}
-		
+
 		// Create the slider
 		$out = "window.{$id} = board_{$boardID}.create('slider', [";
-		
+
 		// Set the positioning
 		if ($relpos) {
-			$out .= "[function() { return board_{$boardID}.getBoundingBox()[0] + {$x1} * (board_{$boardID}.getBoundingBox()[2] - board_{$boardID}.getBoundingBox()[0]); }, 
+			$out .= "[function() { return board_{$boardID}.getBoundingBox()[0] + {$x1} * (board_{$boardID}.getBoundingBox()[2] - board_{$boardID}.getBoundingBox()[0]); },
 					  function() { return board_{$boardID}.getBoundingBox()[1] - {$y1} * (board_{$boardID}.getBoundingBox()[1] - board_{$boardID}.getBoundingBox()[3]); }],
-					 [function() { return board_{$boardID}.getBoundingBox()[0] + {$x2} * (board_{$boardID}.getBoundingBox()[2] - board_{$boardID}.getBoundingBox()[0]); }, 
+					 [function() { return board_{$boardID}.getBoundingBox()[0] + {$x2} * (board_{$boardID}.getBoundingBox()[2] - board_{$boardID}.getBoundingBox()[0]); },
 					  function() { return board_{$boardID}.getBoundingBox()[1] - {$y2} * (board_{$boardID}.getBoundingBox()[1] - board_{$boardID}.getBoundingBox()[3]); }],";
 		} else {
 			$out .= "[{$x1},{$y1}] , [{$x2},{$y2}],";
 		}
-		
+
 		// Set the parameters
 		$out .= " [{$min},{$defaultval},{$max}]],
 			{
@@ -214,23 +214,23 @@ function jsxSlider (&$board, $param, $ops=array()) {
 				name: '{$name}',
 				label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
 			})";
-			
+
 		// Set any remaining paramenters specified by user
 		$out .= isset($ops['attributes']) ? ".setAttribute( {$ops['attributes']} )" : "";
-			
+
 		// Now handle the answerbox communication
 
 		if (isset($ops['answerbox'])) {
-			if (count($ops['answerbox']) == 1) { 
+			if (count($ops['answerbox']) == 1) {
 				$box = $ops['answerbox'][0] - 1;
 			} else {
 				$box = $ops['answerbox'][0] * 1000 + $ops['answerbox'][1];
 			}
-			
+
 			// Add event listener
 			$out .= ".on('up',function() { $('#qn{$box}, #tc{$box}').val(this.Value().toFixed(8));	});";
-			$out .= jsx_getcolorinterval($boardID, $box, $id, "slider", [$min, $max]); 
-	
+			$out .= jsx_getcolorinterval($boardID, $box, $id, "slider", [$min, $max]);
+
 		} else {
 			$out .= ";";
 		}
@@ -240,7 +240,7 @@ function jsxSlider (&$board, $param, $ops=array()) {
 		// Append new output string to the board string
 		$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
 		return $id;
-		
+
 	}
 
 }
@@ -249,15 +249,15 @@ function jsxSlider (&$board, $param, $ops=array()) {
 // The point's coordinates can be saved in an answer box for grading.
 
 function jsxPoint(&$board, $param, $ops=array()) {
-	
+
 	$id = "point_".uniqid();
 	$boardID = jsx_getboardname($board);
 	$out = "";
-	
+
 	if (is_jsxpoint($param)) {
-		
+
 		// Parameter: $fixed, $color, $size, $face, $label, $visible
-				
+
 		$fixed = isset($ops['fixed']) ? jsx_getbool($ops['fixed']) : 'false';
 		$color = isset($ops['color']) ? $ops['color'] : 'black';
 		$size = isset($ops['size']) ? $ops['size'] : 2;
@@ -270,18 +270,18 @@ function jsxPoint(&$board, $param, $ops=array()) {
 		$snapSizeX = isset($ops['xsnapsize']) ? $ops['xsnapsize'] : 1;
 		$snapSizeY = isset($ops['ysnapsize']) ? $ops['ysnapsize'] : 1;
 		$trace = isset($ops['trace']) ? jsx_getbool($ops['trace']) : 'false';
-		
+
 		if ((isset($ops['xsnapsize'])) || (isset($ops['ysnapsize']))) {
 			$snapToGrid = 'true';
 		} else {
 			$snapToGrid = 'false';
 		}
-			
+
 		// Start making the point
 		$out = "window.{$id} = board_{$boardID}.create('point', ".jsx_pointToJS($param).",";
-		
+
 		// Set the attributes
-		
+
 		$out .= "{
 			highlight: !{$fixed},
 			showInfobox: false,
@@ -297,46 +297,46 @@ function jsxPoint(&$board, $param, $ops=array()) {
 			snapSizeY: {$snapSizeY},
 			snapToGrid: {$snapToGrid}
 		})";
-		
+
 		// Set any remaining paramenters specified by user
 		$out .= isset($ops['attributes']) ? ".setAttribute( {$ops['attributes']} )" : "";
-		
+
 		// If answerbox option provided, set up box number
 		if (isset($ops['answerbox'])) {
-			
-			if (count($ops['answerbox']) == 1) { 
+
+			if (count($ops['answerbox']) == 1) {
 				$box = $ops['answerbox'][0] - 1;
 			} else {
 				$box = $ops['answerbox'][0] * 1000 + $ops['answerbox'][1];
 			}
 
 			$answerfill = "'(' + this.X().toFixed(4) + ',' + this.Y().toFixed(4) + ')'";
-			
-			$out .= ".on('up', function() {	$('#qn{$box}, #tc{$box}').val({$answerfill}); } );";  
+
+			$out .= ".on('up', function() {	$('#qn{$box}, #tc{$box}').val({$answerfill}); } );";
 			$out .= jsx_getcolorinterval($boardID, $box, $id, "point");
-				
+
 		} else {
 			$out .= ";";
-		}     
-		
+		}
+
 		$out .= jsx_setlabel($id, $label);
-		
+
 	} else {
 		echo "Eek! parameters for a point must include the board to place it on
 			  and the coordinates as an array.<br>";
 	}
-	
+
 	// Append new output string to the board string
 	$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
 	return $id;
-	
+
 }
 
 // Creates a point that can be moved around the plane, but its movement is
 // restricted to a curve. JSX normally called this a 'glider'.
 
 function jsxGlider (&$board, $param, $ops=array()) {
-	
+
 	$id = "glider_".uniqid();
 	$boardID = jsx_getboardname($board);
 	$inputerror = false;
@@ -362,7 +362,7 @@ function jsxGlider (&$board, $param, $ops=array()) {
 		$snapSizeX = isset($ops['xsnapsize']) ? $ops['xsnapsize'] : 1;
 		$snapSizeY = isset($ops['ysnapsize']) ? $ops['ysnapsize'] : 1;
 		$trace = isset($ops['trace']) ? jsx_getbool($ops['trace']) : 'false';
-		
+
 		if ((isset($ops['xsnapsize'])) || (isset($ops['ysnapsize']))) {
 			$snapToGrid = 'true';
 		} else {
@@ -375,7 +375,7 @@ function jsxGlider (&$board, $param, $ops=array()) {
 		$out .= jsx_valueToJS($param[0][1]).", ";
 		$out .= "{$param[1]}], ";
 
-		// Set attributes 
+		// Set attributes
 		$out .= "{
             highlight: !{$fixed},
             showInfobox: false,
@@ -390,35 +390,35 @@ function jsxGlider (&$board, $param, $ops=array()) {
 			snapSizeY: {$snapSizeY},
 			snapToGrid: {$snapToGrid}
         })";
-		
-		if (isset($ops['attributes'])) { 
+
+		if (isset($ops['attributes'])) {
 			$out .= ".setAttribute({$ops['attributes']})";
-		} 
-		
+		}
+
 		// If answerbox option provided, link the point to the answerbox
 		if (isset($ops['answerbox'])) {
-			
+
 			if (count($ops['answerbox']) == 1) {
 				$box = $ops['answerbox'][0] - 1;
 			} else {
 				$box = $ops['answerbox'][0] * 1000 + $ops['answerbox'][1];
 			}
 
-			$answerfill = "'(' + this.X().toFixed(4) + ',' + this.Y().toFixed(4) + ')'";		
+			$answerfill = "'(' + this.X().toFixed(4) + ',' + this.Y().toFixed(4) + ')'";
 			$out .= ".on('up', function() {	$('#qn{$box}, #tc{$box}').val({$answerfill}); } );";
-					
-			$out .= jsx_getcolorinterval($boardID, $box, $id, "point"); 
-				
+
+			$out .= jsx_getcolorinterval($boardID, $box, $id, "point");
+
 		} else {
 			$out .= ";";
 		}
-		
+
 		$out .= jsx_setlabel($id, $label);
-		
+
 		// Append new output string to the board string
 		$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"), 0);
 		return $id;
-		
+
 	} else {
 		echo "Eek! To attach a point on another object, you must provide a location, and the object.";
 	}
@@ -428,13 +428,13 @@ function jsxGlider (&$board, $param, $ops=array()) {
 // Creats a point at the intersection of two objects
 
 function jsxIntersection(&$board, $param, $ops=array()) {
-	
+
 	$id = "intersection_".uniqid();
 	$boardID = jsx_getboardname($board);
 	$out = "";
-	
+
 	if (is_array($param) && (is_jsxcircleref($param[0]) || is_jsxcircleref($param[1]) || is_jsxlineref($param[0]) || is_jsxlineref($param[1]))) {
-		
+
 		$color = isset($ops['color']) ? $ops['color'] : 'black';
 		$size = isset($ops['size']) ? $ops['size'] : 2;
 		$face = isset($ops['face']) ? $ops['face'] : 'circle';
@@ -445,14 +445,14 @@ function jsxIntersection(&$board, $param, $ops=array()) {
 		$visible = isset($ops['visible']) ? jsx_getbool($ops['visible']) : 'true';
 		$trace = isset($ops['trace']) ? jsx_getbool($ops['trace']) : 'false';
 		$negativeroot = isset($ops['negativeroot']) ? jsx_getbool($ops['negativeroot']) : 'false';
-			
+
 		// Start making the point
 		$out = "window.{$id} = board_{$boardID}.create('intersection', [{$param[0]}, {$param[1]}, ";
-		
+
 		$out .= $negativeroot == 'true' ? "1]," : "0],";
-		
+
 		// Set the attributes
-		
+
 		$out .= "{
 			showInfobox: false,
 			color: '{$color}',
@@ -463,44 +463,44 @@ function jsxIntersection(&$board, $param, $ops=array()) {
 			trace: {$trace},
 			visible: {$visible}
 		})";
-		
+
 		// Set any remaining paramenters specified by user
 		$out .= isset($ops['attributes']) ? ".setAttribute( {$ops['attributes']} )" : "";
-		
+
 		// If answerbox option provided, set up box number
 		if (isset($ops['answerbox'])) {
-			
-			if (count($ops['answerbox']) == 1) { 
+
+			if (count($ops['answerbox']) == 1) {
 				$box = $ops['answerbox'][0] - 1;
 			} else {
 				$box = $ops['answerbox'][0] * 1000 + $ops['answerbox'][1];
 			}
 
 			$answerfill = "'(' + this.X().toFixed(4) + ',' + this.Y().toFixed(4) + ')'";
-			
-			$out .= ".on('up', function() {	$('#qn{$box}, #tc{$box}').val({$answerfill}); } );";  
+
+			$out .= ".on('up', function() {	$('#qn{$box}, #tc{$box}').val({$answerfill}); } );";
 			$out .= jsx_getcolorinterval($boardID, $box, $id, "point");
-				
+
 		} else {
 			$out .= ";";
-		}     
-		
+		}
+
 		$out .= jsx_setlabel($id, $label);
-		
+
 	} else {
 		echo "Eek! parameters for an intersection must include the board to place it on
 			  and two parameters that are either circles or lines to intersect.<br>";
 	}
-	
+
 	// Append new output string to the board string
 	$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
 	return $id;
-	
+
 }
 
 
 function jsxCircle(&$board, $param, $ops=array()) {
-	
+
 	$id = "circle_".uniqid();
 	$boardID = jsx_getboardname($board);
 	$out = "window.{$id} = ";
@@ -526,9 +526,9 @@ function jsxCircle(&$board, $param, $ops=array()) {
 		$out .= jsx_pointToJS($param[0]).", ";
 		$out .= jsx_pointToJS($param[1]).", ";
 		$out .= jsx_pointToJS($param[2])."], ";
-		
+
 	} else if (count($param) == 2 && is_jsxpoint($param[0]) && is_jsxpoint($param[1])) {
-		
+
 		// Circle with center and point
 		$out .= "board_{$boardID}.create('circle', [";
 		$out .= jsx_pointToJS($param[0]).", ".jsx_pointToJS($param[1])."], ";
@@ -537,12 +537,12 @@ function jsxCircle(&$board, $param, $ops=array()) {
 		// Circle with center and radius
 		$out .= "board_{$boardID}.create('circle', [";
 		$out .= jsx_pointToJS($param[0]).", ".jsx_valueToJS($param[1])."], ";
-		
+
 	} else {
 		echo "Invalid parameters for circle, use: [[x, y], r], [[x1, y1], [x2, y2]], or give three points";
 		$is_error = true;
 	}
-	
+
 	if ($is_error == false) {
 		// Set attributes and close up shop.
 		$out .= "{
@@ -565,11 +565,11 @@ function jsxCircle(&$board, $param, $ops=array()) {
 		} else {
 			$out .= ";";
 		}
-		
+
 		$out .= jsx_setlabel($id, $label);
-		
+
 	}
-	
+
 	$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"), 0);
 	return $id;
 
@@ -585,7 +585,7 @@ function jsxPolygon (&$board, $param, $ops=array()) {
 
 	$id = "polygon_".uniqid();
 	$boardID = jsx_getboardname($board);
-	$out = "";	
+	$out = "";
 	$inputerror = false;
 
 	// Validate input values
@@ -603,7 +603,7 @@ function jsxPolygon (&$board, $param, $ops=array()) {
 	if (!$inputerror) {
 
 		// Set default values
-		
+
 		$highlight = isset($ops['highlight']) ? jsx_getbool($ops['highlight']) : 'false';
 		$fixed = isset($ops['fixed']) ? jsx_getbool($ops['fixed']) : 'true';
 		$color = isset($ops['color']) ? $ops['color'] : 'blue';
@@ -612,7 +612,7 @@ function jsxPolygon (&$board, $param, $ops=array()) {
 		$visible = isset($ops['visible']) ? jsx_getbool($ops['visible']) : 'true';
 		$haslabel = isset($ops['label']) ? 'true' : 'false';
 		$label = isset($ops['label']) ? $ops['label'] : '';
-		
+
 		$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
 		$fontcolor = isset($ops['fontcolor']) ? $ops['fontcolor'] : $color;
 
@@ -622,18 +622,18 @@ function jsxPolygon (&$board, $param, $ops=array()) {
 		// Begin object creation
 
 		$out .= "window.{$id} = board_{$boardID}.create('polygon', [";
-		
+
 		$count = 1;
 		$total = count($param);
-		
+
 		foreach($param as $point) {
 			$out .= jsx_pointToJS($point);
 			$count < $total ? $out .= ", " : $out .= "], ";
 			$count += 1;
 		}
 
-		// Set attributes 
-		
+		// Set attributes
+
 		$out .= "{
 			highlight: {$highlight},
 			fixed: {$fixed},
@@ -657,19 +657,19 @@ function jsxPolygon (&$board, $param, $ops=array()) {
 			withLabel: {$haslabel},
 			label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
 		})";
-		
-		if (isset($ops['attributes'])) { 
+
+		if (isset($ops['attributes'])) {
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
 		}
-		
+
 		$out .= jsx_setlabel($id, $label);
-		
+
 		// Append new output string to the board string
 		$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"), 0);
 		return $id;
-		
+
 	} else {
 		echo "Eek! Invalid parameters for polygon object, an array of at least three points expected.";
 	}
@@ -719,8 +719,8 @@ function jsxLine (&$board, $param, $ops=array()) {
 		$out .= jsx_pointToJS($param[0]).", ";
 		$out .= jsx_pointToJS($param[1])."],";
 
-		// Set attributes 
-		
+		// Set attributes
+
 		$out .= "{
             highlight: {$highlight},
             fixed: {$fixed},
@@ -731,23 +731,23 @@ function jsxLine (&$board, $param, $ops=array()) {
 			label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false },
 			visible: {$visible}
 		})";
-		
-		if (isset($ops['attributes'])) { 
+
+		if (isset($ops['attributes'])) {
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
 		}
 
-		$out .= jsx_setlabel($id, $label);	
+		$out .= jsx_setlabel($id, $label);
 
 		// Append new output string to the board string
 		$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"), 0);
 		return $id;
-		
+
 	} else {
 		echo "Eek! Invalid parameters for JSX Line. Start point and end point expected.";
 	}
-}  
+}
 
 ###########################################################################
 ##
@@ -795,8 +795,8 @@ function jsxImage (&$board, $param, $ops=array()) {
 		$out .= jsx_pointToJS($param[1]).", ";
 		$out .= jsx_pointToJS($param[2])."],";
 
-		// Set attributes 
-		
+		// Set attributes
+
 		$out .= "{
             highlight: {$highlight},
             fixed: {$fixed},
@@ -804,23 +804,23 @@ function jsxImage (&$board, $param, $ops=array()) {
 			label: { color:'{$fontcolor}', fontSize: {$fontsize}, highlight: false },
 			visible: {$visible}
 		})";
-		
-		if (isset($ops['attributes'])) { 
+
+		if (isset($ops['attributes'])) {
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
 		}
 
-		$out .= jsx_setlabel($id, $label);	
+		$out .= jsx_setlabel($id, $label);
 
 		// Append new output string to the board string
 		$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"), 0);
 		return $id;
-		
+
 	} else {
 		echo "Eek! Invalid parameters for JSX Image. URL, corner point, and dimensions expected.";
 	}
-}  
+}
 
 ###########################################################################
 ##
@@ -869,7 +869,7 @@ function jsxSegment (&$board, $param, $ops=array()) {
 
 		//	name: '" .$label. "',
 
-		// Set attributes 
+		// Set attributes
 		$out .= "{
             highlight: {$highlight},
             fixed: {$fixed},
@@ -880,19 +880,19 @@ function jsxSegment (&$board, $param, $ops=array()) {
 			withLabel: {$haslabel},
 			label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
         })";
-		
-		if (isset($ops['attributes'])) { 
+
+		if (isset($ops['attributes'])) {
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
 		}
-				
+
 		$out .= jsx_setlabel($id, $label);
-		
+
 		// Append new output string to the board string
 		$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"), 0);
 		return $id;
-		
+
 	} else {
 		echo "Eek! Invalid parameters for JSX segment. Start point and end point expected.";
 	}
@@ -941,8 +941,8 @@ function jsxRay (&$board, $param, $ops=array()) {
 		$out .= jsx_pointToJS($param[0]).", ";
 		$out .= jsx_pointToJS($param[1])."],";
 
-		// Set attributes 
-		
+		// Set attributes
+
 		$out .= "{
 			highlight: {$highlight},
             fixed: {$fixed},
@@ -955,23 +955,23 @@ function jsxRay (&$board, $param, $ops=array()) {
             lastArrow: true,
             straightFirst: false
         })";
-		
-		if (isset($ops['attributes'])) { 
+
+		if (isset($ops['attributes'])) {
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
 		}
-		
-		$out .= jsx_setlabel($id, $label);	
-		
+
+		$out .= jsx_setlabel($id, $label);
+
 		// Append new output string to the board string
 		$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"), 0);
 		return $id;
-		
+
 	} else {
 		echo "Eek! Invalid parameters for JSX ray. Two points expected.";
 	}
-}  
+}
 
 
 // Draws a 2D vector, represented as an arrow starting at point $param[0]
@@ -994,10 +994,10 @@ function jsxVector (&$board, $param, $ops=array()) {
 		$t = $param[1];
 		$offset = isset($ops['offset']) ? $ops['offset'] : 'false';
 		if ($offset !== 'false') {
-			$point0 = ["$offset[0]", "$offset[1]"]; 
+			$point0 = ["$offset[0]", "$offset[1]"];
 			$point1 = ["$offset[0] + $r * Math.cos($t)", "$offset[1] + $r * Math.sin($t)"];
 		} else {
-			$point0 = [0, 0]; 
+			$point0 = [0, 0];
 			$point1 = ["$r * Math.cos($t)", "$r * Math.sin($t)"];
 		}
 	} else {
@@ -1020,9 +1020,9 @@ function jsxVector (&$board, $param, $ops=array()) {
 		// Begin object creation
 		$out = "window.{$id} = board_{$boardID}.create('arrow', [";
 		$out .= jsx_pointToJS($point0).", ";
-		$out .= jsx_pointToJS($point1)."],";	
+		$out .= jsx_pointToJS($point1)."],";
 
-		// Set attributes 
+		// Set attributes
 		$out .= "{
             highlight: {$highlight},
             fixed: {$fixed},
@@ -1031,24 +1031,24 @@ function jsxVector (&$board, $param, $ops=array()) {
             dash: {$dash},
 			withLabel: {$haslabel},
 			label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
-        })";		
-		
-		if (isset($ops['attributes'])) { 
+        })";
+
+		if (isset($ops['attributes'])) {
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
 		}
-		
-		$out .= jsx_setlabel($id, $label);	
-		
+
+		$out .= jsx_setlabel($id, $label);
+
 		// Append new output string to the board string
 		$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"), 0);
 		return $id;
-		
+
 	} else {
 		echo "Eek! Invalid parameters for JSX vector. Initial and terminal points expected.";
 	}
-}  
+}
 
 // Draws a tangent line to a curve at a glider point.
 // Param:
@@ -1060,9 +1060,9 @@ function jsxTangent(&$board, $param, $ops=array()) {
 
 	$id = "tangent_".uniqid();
 	$boardID = jsx_getboardname($board);
-	
+
 	// Validate input values
-	if (strpos($param, "glider_") !== false) { 
+	if (strpos($param, "glider_") !== false) {
 
 		// Set default values
 		$color = isset($ops['color']) ? $ops['color'] : 'black';
@@ -1073,7 +1073,7 @@ function jsxTangent(&$board, $param, $ops=array()) {
 		$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
 		$fontcolor = !empty($ops['fontcolor']) ? $ops['fontcolor'] : $color;
 		$visible = isset($ops['visible']) ? jsx_getbool($ops['visible']) : 'true';
-		
+
 		// Begin object creation
 		$out = "window.{$id} = board_{$boardID}.create('tangent', [ {$param} ], { ";
 
@@ -1088,7 +1088,7 @@ function jsxTangent(&$board, $param, $ops=array()) {
 			highlight: false,
 			label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
 		})";
-		
+
 		if (isset($ops['attributes'])) {
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
@@ -1100,20 +1100,20 @@ function jsxTangent(&$board, $param, $ops=array()) {
 		// Append new output string to the board string{
 		$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"), 0);
 		return $id;
-		
+
 	} else {
 		echo "Eek! You must provide the name of a glider to attach the tangent line to.";
 	}
 
 }
 
-// Creates an integral object, which allows to shade the area trapped between 
-// a curve and the x-axis. $param[0] is an array of a starting x-value and 
+// Creates an integral object, which allows to shade the area trapped between
+// a curve and the x-axis. $param[0] is an array of a starting x-value and
 // ending x-value for the integral, these can be float values or references
 // to other jsx objects. If float values are provided, then a static integral
 // will be created, if jsx objects are provided, then the integral will be
 // interactable. $param[1] is a function created by jsx to find the area
-// under. 
+// under.
 
 function jsxIntegral (&$board, $param, $ops=array()) {
 
@@ -1141,7 +1141,7 @@ function jsxIntegral (&$board, $param, $ops=array()) {
 		$out .= jsx_pointToJS($param[0]).", ";
 		$out .= $param[1]."],";
 
-		// Set attributes 
+		// Set attributes
 		$out .= "{
 			color: '{$color}',
 			fillOpacity: {$fillopacity},
@@ -1152,32 +1152,32 @@ function jsxIntegral (&$board, $param, $ops=array()) {
 			curveRight: { visible: false },
 			label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
 		})";
-		
-		if (isset($ops['attributes'])) { 
+
+		if (isset($ops['attributes'])) {
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
 		}
-		
+
 		$out .= jsx_setlabel($id, $label);
-		
+
 		// Append new output string to the board string
 		$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"), 0);
 		return $id;
-		
+
 	} else {
 		echo "Eek! jsxIntegral expects two inputs: the range for the integral [a, b] and a funtion f.";
 	}
 }
 
 // Creates a Riemann sum trapped between a function and the x-axis, or between two
-// different functions. The parameters expected are passed in an array and are: 
+// different functions. The parameters expected are passed in an array and are:
 // an array containing the lower endpoint and upper endpoint of the interval and
 // the number of rectangles to use. Each of these items can be numeric that will
 // make them static. You can also use references to other jsx objects in order to
 // make them dynamic. The second parameter can be a single function in order to
 // create rectangles between the x-axis and the function, or an array of functions
-// which will draw the rectanges between the functions. The return is an object 
+// which will draw the rectanges between the functions. The return is an object
 // reference that can be used in the creation of other jsx objects.
 
 function jsxRiemannSum (&$board, $param, $ops=array()) {
@@ -1189,7 +1189,7 @@ function jsxRiemannSum (&$board, $param, $ops=array()) {
 	// Validate input values
 	if(!is_array($param[0]) || count($param[0]) != 3) {
 		$inputerror = true;
-	} 
+	}
 	if(!is_jsxvalue($param[1])) {
 		if(!is_jsxpoint($param[1])) {
 			$inputerror = true;
@@ -1212,7 +1212,7 @@ function jsxRiemannSum (&$board, $param, $ops=array()) {
 		// Begin object creation
 
 		$out = "window.{$id} = board_{$boardID}.create('riemannsum', [";
-		
+
 		if(is_array($param[1])) {
 			if(strpos($param[1][0],"_") != false) {
 				$out .= "[{$param[1][0]}_text,";
@@ -1232,15 +1232,15 @@ function jsxRiemannSum (&$board, $param, $ops=array()) {
 				$out .= jsx_functionToJS($param[1], $inputvariable).",";
 			}
 		}
-		
+
 		$out .= jsx_valueToJS($param[0][2]).", ";
 		$out .= "'{$type}', ";
 		$out .= jsx_valueToJS($param[0][0]).", ";
 		$out .= jsx_valueToJS($param[0][1])."],";
 
 
-		// Set attributes 
-		
+		// Set attributes
+
 		$out .= "{
 			strokeColor: '{$color}',
 			fillColor: '{$fillcolor}',
@@ -1250,19 +1250,19 @@ function jsxRiemannSum (&$board, $param, $ops=array()) {
 			highlight: false,
 			label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
 		})";
-		
-		if (isset($ops['attributes'])) { 
+
+		if (isset($ops['attributes'])) {
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
 		}
-		
+
 		$out .= jsx_setlabel($id, $label);
-		
+
 		// Append new output string to the board string
 		$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"), 0);
 		return $id;
-		
+
 	} else {
 		echo "Eek! jsxReimannSum expects an array like [a, b, n] for the first input, and either a
 			function or an array of two functions for the second.";
@@ -1284,7 +1284,7 @@ function jsxText (&$board, $param, $ops=array()) {
 
 	// Validate input values
 	if (is_jsxpoint($param[0]) && (is_jsxvalue($param[1]) || is_array($param[1]))) {
-			
+
 		// Set default values
 		$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
 		$highlight = isset($ops['highlight']) ? jsx_getbool($ops['highlight']) : 'false';
@@ -1293,17 +1293,17 @@ function jsxText (&$board, $param, $ops=array()) {
 		$anchor = isset($ops['anchor']) ? $ops['anchor'] : false;
 		$anchorX = isset($ops['anchorX']) ? $ops['anchorX'] : false;
 		$anchorY = isset($ops['anchorY']) ? $ops['anchorY'] : false;
-		
+
 		// Begin object creation
 
 		$out = "window.{$id} = board_{$boardID}.create('text', [";
-		
+
 		if (is_array($param[0])) {
 			$out .= jsx_valueToJS($param[0][0]).", ".jsx_valueToJS($param[0][1]).", ";
 		} else if(is_jsxpointref($param[0])) {
 			$out .= jsx_valueToJS("$param[0].X()").", ".jsx_valueToJS("$param[0].Y()").", ";
 		}
-		
+
 		if (is_jsxvalue($param[1])) {
 			if (count(jsx_getobjectreferences($param[1])) > 0) {
 				$out .= "function() { return {$param[1]}; }],";
@@ -1311,37 +1311,37 @@ function jsxText (&$board, $param, $ops=array()) {
 				$out .= "'{$param[1]}'],";
 			}
 		} else if (is_array($param[1])) {
-			
+
 			$makepretty = false;
 			$display = false;
-			
+
 			for ($i = 1; $i < count($param[1]); $i++) {
-				
+
 				switch ($param[1][$i]) {
 					case 'makepretty' :	$makepretty = true;	break;
 					case 'display' : $display = true; break;
 					default:
 						echo "Warning: Unknown label rendering hint encountered: {$param[1][$i]}";
 				}
-				
+
 			}
-			
+
 			$label = $param[1][0];
-			
+
 			if ($label !== '') {
 
 				if ($makepretty && !$display) {
 					$out .= "function() { return jsx_clean({$label}); }],";
-				} 
-				
+				}
+
 				if (!$makepretty && $display) {
 					$out .= "function() { return '`' + {$label} + '`';  }],";
 				}
-				
+
 				if ($makepretty && $display) {
 					$out .= "function() { return '`' + jsx_clean({$label}) + '`';  }],";
 				}
-				
+
 				if (!$makepretty && !$display) {
 					if (count(jsx_getobjectreferences($label)) > 0) {
 						$out .= "function() { return {$label}; }],";
@@ -1351,11 +1351,11 @@ function jsxText (&$board, $param, $ops=array()) {
 				}
 
 			}
-		
-		} 
 
-		// Set attributes 
-		
+		}
+
+		// Set attributes
+
 		$out .= "{";
 		$out .= "useMathJax: 'true',";
 		$out .= "fontSize: {$fontsize},";
@@ -1363,34 +1363,34 @@ function jsxText (&$board, $param, $ops=array()) {
 		$out .= "fixed: {$fixed},";
 		$out .= "color: '{$color}',";
 		if($anchor !== false) {
-			$out .= "anchor: {$anchor},"; 
+			$out .= "anchor: {$anchor},";
 		}
 		if($anchorX !== false) {
             $anchorX = preg_replace('/[^\w\-]/','',$anchorX);
-			$out .= "anchorX: '{$anchorX}',"; 
+			$out .= "anchorX: '{$anchorX}',";
 		}
 		if($anchorY !== false) {
             $anchorY = preg_replace('/[^\w\-]/','',$anchorY);
-			$out .= "anchorY: '{$anchorY}',"; 
+			$out .= "anchorY: '{$anchorY}',";
 		}
         $out .= "})";
-		
-		if (isset($ops['attributes'])) { 
+
+		if (isset($ops['attributes'])) {
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
 		}
-		
+
 		// Append new output string to the board string
 		$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"), 0);
 		return $id;
-		
+
 	} else {
 		echo "Eek! Invalid parameters given to JSX text object. Expected: location and string.";
 	}
-}  
- 
- 
+}
+
+
 ###########################################################################
 ##
 ## Creates an angle with three points, $param[1] is the center point.
@@ -1431,9 +1431,9 @@ function jsxAngle (&$board, $param, $ops=array()) {
 		$out = "window.{$id} = board_{$boardID}.create('angle', [";
 		$out .= jsx_pointToJS($param[0]).", ";
 		$out .= jsx_pointToJS($param[1]).", ";
-		$out .= jsx_pointToJS($param[2])."],";	
+		$out .= jsx_pointToJS($param[2])."],";
 
-		// Set attributes 
+		// Set attributes
 		$out .= "{
             highlight: {$highlight},
             fixed: {$fixed},
@@ -1443,8 +1443,8 @@ function jsxAngle (&$board, $param, $ops=array()) {
 			fillOpacity: {$fillopacity},
 			label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
         })";
-		
-		if (isset($ops['attributes'])) { 
+
+		if (isset($ops['attributes'])) {
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
@@ -1455,28 +1455,28 @@ function jsxAngle (&$board, $param, $ops=array()) {
 		// Append new output string to the board string
 		$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"), 0);
 		return $id;
-		
+
 	} else {
 		echo "Eek! Error in the parameters to JSX angle. Three points expected.";
 	}
-}  
- 
+}
+
 ###############################################################################
 ##
 ##  Adds a function to bhe board
 ##
 ###############################################################################
 
-function jsxFunction(&$board, $f, $ops=array()) { 
-  
+function jsxFunction(&$board, $f, $ops=array()) {
+
 	$id = "function_".uniqid();
 	$boardID = jsx_getboardname($board);
 
 	// Parameters:
 	//  inputvariable, color, width, dash, domain, label
-	
+
 	// Make some default values
-	$inpVar = isset($ops['inputvariable']) ? $ops['inputvariable'] : 'x'; 
+	$inpVar = isset($ops['inputvariable']) ? $ops['inputvariable'] : 'x';
 	$color = isset($ops['color']) ? $ops['color'] : 'blue';
 	$width = isset($ops['width']) ? $ops['width'] : 2;
 	$dash = isset($ops['dash']) ? $ops['dash'] : 0;
@@ -1486,25 +1486,25 @@ function jsxFunction(&$board, $f, $ops=array()) {
 	$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : '16';
 	$isBounds = (isset($ops['domain']) && count($ops['domain']) == 2) ? true : false;
 	$visible = isset($ops['visible']) ? jsx_getbool($ops['visible']) : 'true';
-  
+
 	$objects = jsx_getobjectreferences($f);
-  
+
 	// Here we preserve the text of the function so it can be used in other objects
 	// like Riemannsum
 	$out = "window.{$id}_text = ".jsx_functionToJS($f, $inpVar).";";
-  
+
 	// Start the output string
 	$out .= "window.{$id} = board_{$boardID}.create('functiongraph', [";
-	$out .= jsx_functionToJS($f, $inpVar); 
-  
+	$out .= jsx_functionToJS($f, $inpVar);
+
 	// Handle domain restriction, if provided
-	if ($isBounds) { 
+	if ($isBounds) {
 		$out .= ','.jsx_valueToJS($ops['domain'][0]);
 		$out .= ','.jsx_valueToJS($ops['domain'][1]);
 	}
-	
+
 	$out .= "]";
-  
+
 	// Handle attributes, then close up shop.
 	$out .= ", {
 		strokeColor: '{$color}',
@@ -1516,7 +1516,7 @@ function jsxFunction(&$board, $f, $ops=array()) {
 		label: { color: '{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false },
 		withLabel: {$haslabel}
 	})";
-  
+
 	if (isset($ops['attributes'])) {
 		$out .= ".setAttribute({$ops['attributes']});";
 	} else {
@@ -1542,7 +1542,7 @@ function jsxParametric (&$board, $param, $ops=array()) {
 
 	$id = "parametric_".uniqid();
 	$boardID = jsx_getboardname($board);
-	
+
 	// Validate input values
 	if (is_jsxpoint($param)) {
 
@@ -1558,10 +1558,10 @@ function jsxParametric (&$board, $param, $ops=array()) {
 		$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : 16;
 		$fontcolor = isset($ops['fontcolor']) ? $ops['fontcolor'] : $color;
 		$visible = isset($ops['visible']) ? jsx_getbool($ops['visible']) : 'true';
-		
+
 		// Begin object creation
 		$out = "window.{$id} = board_{$boardID}.create('curve', [";
-		$out .= jsx_functionToJS($param[0], $inpVar).", "; 
+		$out .= jsx_functionToJS($param[0], $inpVar).", ";
 		$out .= jsx_functionToJS($param[1], $inpVar).", ";
 		$out .= jsx_valueToJS($tStart).", ";
 		$out .= jsx_valueToJS($tEnd)."], ";
@@ -1577,22 +1577,22 @@ function jsxParametric (&$board, $param, $ops=array()) {
             name: '{$label}',
 			label: { color: '{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
         })";
-		
+
 		if (isset($ops['attributes'])) {
 			$out .= ".setAttribute({$ops['attributes']})";
 		} else {
 			$out .= ";";
 		}
-		
-		$out .= jsx_setlabel($id, $label);		
-		
+
+		$out .= jsx_setlabel($id, $label);
+
 		// Append new output string to the board string
 		$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
 		return $id;
-		
+
 	} else {
 		echo "Eek! Invalid parameters for paramtric function. Expecting an array with functions for x and y.";
-	}	
+	}
 }
 
 // Draws the graph of a Polar function on a jsx board
@@ -1605,10 +1605,10 @@ function jsxParametric (&$board, $param, $ops=array()) {
 //   - $color, $width
 
 function jsxPolar (&$board, $rule, $ops = array()) {
-	
+
 	$id = "polar_".uniqid();
 	$boardID = jsx_getboardname($board);
-	
+
 	// Validate input values
 	if (is_string($rule)) {
 
@@ -1628,10 +1628,10 @@ function jsxPolar (&$board, $rule, $ops = array()) {
 		// Begin object creation
 		$out = "window.{$id} = board_{$boardID}.create('curve', [";
 		$out .= jsx_functionToJS($rule, $var).", [0, 0], ";
-  
+
 		$out .= jsx_valueToJS($tStart).", ";
 		$out .= jsx_valueToJs($tEnd)."], ";
-		
+
 		// Set attributes
 		$out .= "{
 			curveType: 'polar',
@@ -1645,14 +1645,14 @@ function jsxPolar (&$board, $rule, $ops = array()) {
 			withLabel: {$haslabel},
 			label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false }
 		})";
-		
+
 		if (isset($ops['attributes'])) {
 			$out .= ".setAttribute({$ops['attributes']});";
 		} else {
 			$out .= ";";
 		}
-		
-		$out .= jsx_setlabel($id, $label);		
+
+		$out .= jsx_setlabel($id, $label);
 
 		// Append new output string to the board string
 		$board = substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"), 0);
@@ -1666,7 +1666,7 @@ function jsxPolar (&$board, $rule, $ops = array()) {
 ###############################################################################
 ##
 ##  The remaining functions are dedicated to creating jsx boards that objects
-##    can be placed onto. The only function called by the user is: 
+##    can be placed onto. The only function called by the user is:
 ##    jsxBoard() with an input indicating if a geometric, rectangular,
 ##    or polar board should be created for use.
 ##
@@ -1674,9 +1674,9 @@ function jsxPolar (&$board, $rule, $ops = array()) {
 
 function jsxBoard($type, $ops=array()) {
 	//jsx_getscript();
-	
+
 	$id = uniqid();
-	
+
 	if($type == 'rectangular') {
 		$board = jsx_createrectangularboard($id, $ops);
 	} elseif ($type == 'polar') {
@@ -1686,21 +1686,21 @@ function jsxBoard($type, $ops=array()) {
 	}
 
 	return $board;
-	
+
 }
 
 // Creates a link to the jsx include file
 function jsx_getscript () {
-	
+
 	if (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1) {
 		return '<script type="text/javascript" src="'.jsx_getlibrarylink().'"></script>' .
             '<script type="text/javascript">
             if ($("head").find("link[href*=jsxgraph]").length == 0) {
                 $("<link/>", {rel: "stylesheet", href: "'.jsx_getcsslink().'"}).appendTo("head");
             }
-            </script>';	
+            </script>';
 	} else {
-		return 
+		return
 			'<script type="text/javascript">if (typeof JXG === "undefined" && typeof JXGscriptloaded === "undefined") {
 			var jsxgloadscript = document.createElement("script");
 			jsxgloadscript.src = "'.jsx_getlibrarylink().'";
@@ -1732,7 +1732,7 @@ function jsx_getscript () {
 				exp = exp.replaceAll(/=\s*\+/g, "="); // =+2x -> =2x
 				exp = exp.replaceAll(/\+\s*\-/g, "-");
 				exp = exp.replaceAll(/\-\s*\+/g, "-");
-				exp = exp.replaceAll(/\-\s*\-/g, "+");	
+				exp = exp.replaceAll(/\-\s*\-/g, "+");
 				exp = exp.replaceAll(/\+\s*\+/g, "+");
 				if (exp[0] == "+") {
 					exp = exp.substring(1);
@@ -1748,31 +1748,31 @@ function jsx_getscript () {
 
 // Set up a board. Auxillary functions
 function jsx_setupboard ($label, $width, $height, $centered) {
-	
+
 	$cntrd = $centered === 'true' ? "margin:auto;" : "";
 	$ratio = 100 * ($height / $width);
-  
+
 	// Start output string by getting script
 	$out = jsx_getscript();
-  
+
 	// make board
 	$out .= "<div class='jxgboardwrapper' style='max-width:{$width}px; max-height:{$height}px; {$cntrd}'>";
 	$out .= "<div id='jxgboard_{$label}' style='background-color:#FFF; width:100%; height:0px; padding-bottom:{$ratio}%;'></div>";
 	$out .= "</div>";
-  
+
 	// Start script
 	$out .= "<script type='text/javascript'>";
-  
+
 	// We build construction function inline, push function to initstack to load async
 	$out .= "function makeBoard{$label}() {";
     $out .= "try {";
 	$out .= "JXG.Options.text.fontSize = 16;";
 	$out .= 'JXG.Options.text.cssDefaultStyle = "font-family:Serif;";';
 	$out .= 'JXG.Options.axis.lastArrow.size = 5;';
-	
+
 	// This is where new content gets inserted
 	$out .= "/*INSERTHERE*/";
-	
+
 	// End of construction function. Push it to initstack
 	$out .= "} catch(err){console.log(err);}";
     $out .= "}";
@@ -1785,7 +1785,7 @@ function jsx_setupboard ($label, $width, $height, $centered) {
 
 // creates a board with no axes
 function jsx_creategeometryboard($label, $ops) {
-  
+
 	// Set default values
 	$width = isset($ops['size'][0]) ? $ops['size'][0] : 350; // board width
 	$height = isset($ops['size'][1]) ? $ops['size'][1] : 350; // board height
@@ -1795,7 +1795,7 @@ function jsx_creategeometryboard($label, $ops) {
 	$centered = isset($ops['centered']) ? jsx_getbool($ops['centered']) : 'false';
     $title = Sanitize::encodeStringForJavascript($ops['title'] ?? '');
     $description = Sanitize::encodeStringForJavascript($ops['description'] ?? '');
-  
+
 	//set the min and max x-values if provided, else default to [-5, 5]
 	$xmin = isset($ops['bounds'][0]) ? $ops['bounds'][0] : -5;
 	$xmax = isset($ops['bounds'][1]) ? $ops['bounds'][1] : 5;
@@ -1831,7 +1831,7 @@ function jsx_creategeometryboard($label, $ops) {
 
 // creates a board with a rectangular set of axes on it
 function jsx_createrectangularboard ($label, $ops = array()) {
-	
+
 	// Set default values
 	$width = isset($ops['size'][0]) ? $ops['size'][0] : 350; // board width
 	$height = isset($ops['size'][1]) ? $ops['size'][1] : 350; // board height
@@ -1852,13 +1852,13 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 	$minorTicksY = isset($ops['minorticks'][1]) ? $ops['minorticks'][1] : 0;
 	$ticksDistanceX = isset($ops['ticksdistance'][0]) ? $ops['ticksdistance'][0] : max(1,floor((($xmax)-($xmin))/8));
 	$ticksDistanceY = isset($ops['ticksdistance'][1]) ? $ops['ticksdistance'][1] : max(1,floor((($ymax)-($ymin))/8));
-	
+
 	$showXLabels = isset($ops['showlabels'][0]) ? jsx_getbool($ops['showlabels'][0]) : 'true';
 	$showYLabels = isset($ops['showlabels'][1]) ? jsx_getbool($ops['showlabels'][1]) : 'true';
-	
+
 	$gridHeightX = isset($ops['gridheight'][0]) ? $ops['gridheight'][0] : -1;
 	$gridHeightY = isset($ops['gridheight'][1]) ? $ops['gridheight'][1] : -1;
-	
+
 	$minorTickHeightX = isset($ops['minortickheight'][0]) ? $ops['minortickheight'][0] : 10;
 	$minorTickHeightY = isset($ops['minortickheight'][1]) ? $ops['minortickheight'][1] : 10;
 
@@ -1870,7 +1870,7 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 	// Start output
 	$out = "JXG.Options.layer = { numlayers: 20, text: 9, point: 9, glider: 9, arc: 8, line: 7, circle: 6,
             curve: 5, turtle: 5, polygon: 3, sector: 3, angle: 3, integral: 3, axis: 3, ticks: 2, grid: 1, image: 0, trace: 0};";
-   
+
 	// Create the board
 	$out .= "window.board_{$label} = JXG.JSXGraph.initBoard('jxgboard_{$label}', {
              boundingbox: [{$xmin}, {$ymax}, {$xmax}, {$ymin}],
@@ -1894,7 +1894,7 @@ function jsx_createrectangularboard ($label, $ops = array()) {
            });";
 
 	$out .= "var xTicks{$label}, yTicks{$label};";
-   
+
 	// x-axis
 	$xaxis_label = isset($ops['axislabel'][0]) ? $ops['axislabel'][0] : "";
 	$out .= "var xaxis{$label} = board_{$label}.create('axis', [[0,0], [1,0]], {
@@ -1902,10 +1902,10 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 				strokeWidth: 2,
 				highlight:false,
 				name: '{$xaxis_label}',
-				label: { 
-					position: 'rt', 
-					offset: [{$labelOffsetX[0]}, {$labelOffsetX[1]}], 
-					highlight: false, 
+				label: {
+					position: 'rt',
+					offset: [{$labelOffsetX[0]}, {$labelOffsetX[1]}],
+					highlight: false,
 					useMathJax: {$useMathJax}
 				},
 				ticks: {
@@ -1915,14 +1915,14 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 					majorHeight: $gridHeightX,
 					minorHeight: $minorTickHeightX,
 					color: 'black',
-					label: { 
-						offset: [0,-5], 
-						anchorY: 'top', 
-						anchorX: 'middle', 
-						highlight: false, 
+					label: {
+						offset: [0,-5],
+						anchorY: 'top',
+						anchorX: 'middle',
+						highlight: false,
 						visible: $showXLabels
 					}
-				} 
+				}
             });
 			xaxis{$label}.setLabel('{$xaxis_label}');";
 
@@ -1936,9 +1936,9 @@ function jsx_createrectangularboard ($label, $ops = array()) {
                name:'{$yaxis_label}',
                withLabel:true,
                label: {
-					position:'rt', 
-					offset:[{$labelOffsetY[0]}, {$labelOffsetY[1]}], 
-					highlight:false, 
+					position:'rt',
+					offset:[{$labelOffsetY[0]}, {$labelOffsetY[1]}],
+					highlight:false,
 					useMathJax:{$useMathJax}},
 			   ticks: {
 					insertTicks: false,
@@ -1948,15 +1948,15 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 					minorHeight: $minorTickHeightY,
 					label: {
 						offset: [-5,0],
-						anchorY: 'middle', 
-						anchorX: 'right', 
+						anchorY: 'middle',
+						anchorX: 'right',
 						highlight: false,
 						visible: $showYLabels
 					}
-				} 
+				}
              });
 			 yaxis{$label}.setLabel('{$yaxis_label}');";
-	  
+
 	$boardinit = jsx_setupboard($label, $width, $height, $centered);
     return substr_replace($boardinit, $out, strpos($boardinit, "/*INSERTHERE*/"), 0);
 
@@ -1988,14 +1988,14 @@ function jsx_createpolarboard ($label, $ops=array()) {
 	$yMax = (1 + 2*($boardYScale - 1)) * $rMaxBoard;
 
 	// Layering options. Push the axis in front of ticks
-	$out = "JXG.Options.layer = { numlayers: 20, text: 9, point: 9, 
-		glider: 9, arc: 8, line: 7, circle: 6, curve: 8, turtle: 5, 
-		polygon: 3, sector: 3, angle: 3, integral: 3, axis: 3, ticks: 2, 
+	$out = "JXG.Options.layer = { numlayers: 20, text: 9, point: 9,
+		glider: 9, arc: 8, line: 7, circle: 6, curve: 8, turtle: 5,
+		polygon: 3, sector: 3, angle: 3, integral: 3, axis: 3, ticks: 2,
 		grid: 1, image: 0, trace: 0}; ";
-		
+
 	$out .= "JXG.Options.text.fontSize = 18;";
 	//$out .= "JXG.Options.text.useMathJax = true;";
-   
+
 	// Create the board
 	$defaultAxis = !empty($ops['ticksdistance']) ? "false" : "true";
 	$out .= "
@@ -2083,7 +2083,7 @@ function jsx_createpolarboard ($label, $ops=array()) {
 					}
 				";
 			break;
-      
+
 			// Degree case. Nothing special here
 			case "degrees":
 				$out .= "
@@ -2109,7 +2109,7 @@ function jsx_createpolarboard ($label, $ops=array()) {
 					}
 				";
 			break;
-			
+
 			// Custom unit of angle measure.
 			// Increment now becomes number of units in one full rotation
 			case "custom":
@@ -2135,7 +2135,7 @@ function jsx_createpolarboard ($label, $ops=array()) {
 					}
 				";
 			break;
-      
+
 			// The "radian" case, and fallback
 			default:
 				$out .= "
@@ -2160,7 +2160,7 @@ function jsx_createpolarboard ($label, $ops=array()) {
 					}
 				";
 	}
-    
+
 	// Get initial board, add this output string to it.
     $boardinit = jsx_setupboard($label, $size, $boardHeight, $centered);
     return substr_replace($boardinit, $out, strpos($boardinit, "/*INSERTHERE*/"), 0);
@@ -2189,7 +2189,7 @@ function jsxUnsuspendUpdate(&$board) {
 ##
 ##############################################################################
 
-// Takes a point, denoted as (x,y) in string format as input and returns 
+// Takes a point, denoted as (x,y) in string format as input and returns
 // the x coordinate of the point
 
 function jsx_getXCoord($point) {
@@ -2200,18 +2200,18 @@ function jsx_getXCoord($point) {
 	return substr($point, $start, $end - $start);
 }
 
-// Takes a point, denoted as (x,y) in string format as input and returns 
+// Takes a point, denoted as (x,y) in string format as input and returns
 // the y coordinate of the point
 
 function jsx_getYCoord($point) {
 	// Remove all spaces from the point string
-	$point = str_replace(' ', '', $point); 
+	$point = str_replace(' ', '', $point);
 	$start = stringpos(",", $point) + 1;
 	$end = stringpos(")", $point);
 	return substr($point, $start, $end - $start);
 }
 
-// Takes a point, denoted as (x,y) in string format as input and returns 
+// Takes a point, denoted as (x,y) in string format as input and returns
 // the x and y coordinates of the point as an array
 function jsx_getCoords($point) {
 	return [jsx_getXCoord($point), jsx_getYCoord($point)];
@@ -2231,14 +2231,14 @@ function jsxSetChild($parentBoard, &$childBoard) {
 ##
 ###############################################################################
 
-// Returns true if the $item provided is a reference to an object 
-// type found in the objects type list. If $strict is set to true, 
+// Returns true if the $item provided is a reference to an object
+// type found in the objects type list. If $strict is set to true,
 // then the function returns true if the $items is only and object
-// and has no property function attached. 
+// and has no property function attached.
 // A proper object reference looks like: point_iH5j2k31aB4jk
 
 function is_jsxobjectref($item, $strict = true) {
-	
+
 	if ($item !== null && is_string($item)) {
 		if ($strict) {
 			$obj_pattern = "/^\s*(".jsx_validobjectlist("|").")_\w{".jsx_idlen()."}\s*$/i";
@@ -2249,12 +2249,12 @@ function is_jsxobjectref($item, $strict = true) {
 	} else {
 		return false;
 	}
-	
+
 }
 
 // Returns true if the provided object is a point reference of some
 // kind of point in JSX Graph. This can be a point, a glider, a midpoint,
-// the center of a circle, etc. 
+// the center of a circle, etc.
 
 function is_jsxpointref($item) {
 	if ($item !== null && is_string($item)) {
@@ -2268,7 +2268,7 @@ function is_jsxpointref($item) {
 // be the x or y property of another jsx point
 
 function is_jsxpoint($item) {
-	
+
 	// Make sure we have an array of two objects: the item looks like [x, y]
 	if (is_array($item) && count($item) == 2) {
 
@@ -2276,17 +2276,17 @@ function is_jsxpoint($item) {
 		if (is_jsxvalue($item[0]) && is_jsxvalue($item[1])) {
 			return true;
 		}
-		
+
 	}
-	
+
 	// If $item is a reference to a jsx point, then is is valid too
 	if (is_jsxpointref($item)) {
 		return true;
 	}
-		
+
 	// If neither of those cases applies, this is not a point
 	return false;
-	
+
 }
 
 // A value will either be a numeric constanst or a string that contains a
@@ -2309,7 +2309,7 @@ function is_jsxcircleref($item) {
 	}
 }
 
-// Returns true if the provided object is a line reference of some kind 
+// Returns true if the provided object is a line reference of some kind
 
 function is_jsxlineref($item) {
 	if ($item !== null && is_string($item)) {
@@ -2319,38 +2319,38 @@ function is_jsxlineref($item) {
 }
 
 // Returns a list of the different valid object types as a string
-// separated by comma (default) or any other character 
+// separated by comma (default) or any other character
 function jsx_validobjectlist($sep = null) {
-	
+
 	$separator = is_null($sep) ? "," : $sep;
 	$len = -strlen($separator);
 	$str = "";
-	
+
 	foreach(jsx_validobjects() as $obj) {
 		$str .= $obj . $separator;
 	}
-	
+
 	return substr($str, 0, $len);
 }
 
 // Finds all the referneces to jsxobjects within a string
 function jsx_getobjectreferences($str) {
-	
+
 	$idLen = jsx_idlen();
 	$objs = jsx_validobjectlist("|");
 
 	$property_pattern = "/(?:".$objs.")_\w{".jsx_idlen()."}\.\w*\(\)/i";
 	$object_pattern = "/(?:".$objs.")_\w{".jsx_idlen()."}/i";
-	
+
 	// First find all the property references, like $p.X()
 	preg_match_all($property_pattern, $str, $properties);
-	
+
 	// Delete all those references
 	$str = preg_replace($property_pattern, "", $str);
-	
+
 	// Now look for any remaining object references with no properties
 	preg_match_all($object_pattern, $str, $objects);
-	
+
 	return array_merge($properties[0], $objects[0]);
 
 }
@@ -2361,7 +2361,7 @@ function jsx_getboardname($board) {
 	$labStart = strpos($board, "jxgboard_") + 9;
 	$labEnd = strpos($board, "'", $labStart);
 	$label = substr($board, $labStart, $labEnd - $labStart);
-	
+
 	return $label;
 }
 
@@ -2375,25 +2375,25 @@ function jsx_getslidercount($board) {
 //    Result is wrapped in [,] to define the point.
 
 function jsx_pointToJS($point) {
-	
+
 	if (is_array($point)) {
 		$js = "[".jsx_valueToJS($point[0]).", ".jsx_valueToJS($point[1])."]";
 	} else if(is_jsxpointref($point)) {
 		$js = $point;
 	}
 	return $js;
-	
+
 }
 
 
-//  Converts a value encoded into a string into a piece of 
+//  Converts a value encoded into a string into a piece of
 //    javascript that can be executed. Result is not wrapped
-//    in any additional notation. The extra set of parenthesis 
+//    in any additional notation. The extra set of parenthesis
 //    around the {$obj} replacement value handle issues of two
 //    negative values ocurring in a row.
 
 function jsx_valueToJS($value) {
-	
+
 	$js = "";
 	if (is_numeric($value)) {
 		$js = "{$value}";
@@ -2413,17 +2413,17 @@ function jsx_valueToJS($value) {
         $js .= "xs = xs.replace(/(\d)e(-?\d)/g, '$1E$2');";
 		$js .= "with (Math) var x = eval(mathjs(xs)); return x;";
 		$js .= "}";
-	}	
+	}
 	return $js;
 }
 
-//  Converts a text-object encoded into a string into a piece of 
+//  Converts a text-object encoded into a string into a piece of
 //    javascript that can be used to display values of objects on
 //    a jsx board. $decimals is used to round values to a given
 //    number of decimal places.
 
 function jsx_textToJS($text, $decimals) {
-	
+
 	$js = "";
 
 	$objs = jsx_getobjectreferences($text);
@@ -2440,7 +2440,7 @@ function jsx_textToJS($text, $decimals) {
 	}
 	$js .= "return ts;";
 	$js .= "}";
-		
+
 	return $js;
 }
 
@@ -2449,7 +2449,7 @@ function jsx_textToJS($text, $decimals) {
 //   is the independent variable of the function.
 
 function jsx_functionToJS($rule, $var) {
-	
+
 	$js = "";
 
 	$objs = jsx_getobjectreferences($rule);
@@ -2467,8 +2467,8 @@ function jsx_functionToJS($rule, $var) {
     }
     $js .= "ts = ts.replace(/(\d)e(-?\d)/g, '$1E$2');";
 	$js .= "with (Math) var result = eval(mathjs(ts, '{$var}'));
-            return result; }"; 
-		
+            return result; }";
+
 	return $js;
 }
 
@@ -2476,7 +2476,7 @@ function jsx_functionToJS($rule, $var) {
 // values from the options input strings
 
 function jsx_getbool($bool) {
-	if ($bool === true || $bool === 'true') { 
+	if ($bool === true || $bool === 'true') {
 		return 'true';
 	} else {
 		return 'false';
@@ -2484,7 +2484,7 @@ function jsx_getbool($bool) {
 }
 
 
-// Affixes a label to a jsx object, sets it up so that it can be dynamic 
+// Affixes a label to a jsx object, sets it up so that it can be dynamic
 // or static. A string for the label can be passed, or an array that
 // contains the label string along with some rendering hints. The possible
 // rendering hints are: makepretty, display, function.
@@ -2493,9 +2493,9 @@ function jsx_getbool($bool) {
 // function will allow the user to provide a javascript function to
 //   allow for high levels of customization
 function jsx_setlabel($id, $label) {
-	
+
 	$js = "{$id}.label.setText('');";
-	
+
 	if (is_string($label)) {
 		if ($label !== '') {
 			if (strpos($label, 'this.') !== false) {
@@ -2507,27 +2507,27 @@ function jsx_setlabel($id, $label) {
 			} else {
 				$js = "{$id}.label.setText('{$label}');";
 			}
-		
+
 			return $js;
 		}
 	} else if (is_array($label)) {
 
 		$makepretty = false;
 		$display = false;
-		
+
 		for ($i = 1; $i < count($label); $i++) {
-			
+
 			switch ($label[$i]) {
 				case 'makepretty' :	$makepretty = true;	break;
 				case 'display' : $display = true; break;
 				default:
 					echo "Warning: Unknown label rendering hint encountered: {$label[$i]}";
 			}
-			
+
 		}
-		
+
 		$label = $label[0];
-		
+
 		if ($label !== '') {
 			if (strpos($label, 'this.') !== false) {
 				$label = str_replace('this', $id, $label);
@@ -2535,16 +2535,16 @@ function jsx_setlabel($id, $label) {
 
 			if ($makepretty && !$display) {
 				$js = "{$id}.label.setText(function() { return jsx_clean({$label}); });";
-			} 
-			
+			}
+
 			if (!$makepretty && $display) {
 				$js = "{$id}.label.setText(function() { return '`' + {$label} + '`';  });";
 			}
-			
+
 			if ($makepretty && $display) {
 				$js = "{$id}.label.setText(function() { return '`' + jsx_clean({$label}) + '`';  });";
 			}
-		
+
 			if (!$makepretty && !$display) {
 				if (count(jsx_getobjectreferences($label)) > 0) {
 					$js = "{$id}.label.setText(function() { return {$label}; });";
@@ -2552,10 +2552,10 @@ function jsx_setlabel($id, $label) {
 					$js = "{$id}.label.setText('{$label}');";
 				}
 			}
-		
+
 			return $js;
 		}
-		
+
 	}
 }
 
@@ -2567,28 +2567,49 @@ function jsx_setlabel($id, $label) {
 function jsx_getcolorinterval($boardID, $box, $obj, $type, $param = array()) {
 
 	if ($type == "point") {
-		$reposition_obj = 
+		$reposition_obj =
 			"var coords = $('#qn{$box}').val();
 			coords = coords.substring(1, coords.length - 2);
 			coords = coords.split(',');
 			{$obj}.setPosition(JXG.COORDS_BY_USER, [parseFloat(coords[0]),parseFloat(coords[1])]);";
-			
+
 	} else if ($type == "slider") {
-		
+
 		$min = $param[0];
 		$max = $param[1];
-		$reposition_obj = 
+		$reposition_obj =
 			"var tc = $('#qn{$box}').val();
 			{$obj}.setGliderPosition(((tc)-({$min}))/(({$max})-({$min})));";
 	}
 
-	$out = 
-		"var colorInterval{$boardID}_{$box} = setInterval(function() {  
+	$out =
+		"var colorInterval{$boardID}_{$box} = setInterval(function() {
 			if ($('#qn{$box}')[0] || $('#qn{$box}')[0]) {
+				//TODO: Fix this. Needs to consider other answerboxes too.
+				//probably easiest to add ansgrn/ansred class to board, then
+				//look to see if a class is already set on the board and incorporate that
 				if ($('#qn{$box}, #tc{$box}').is('.ansgrn')) {
-					$('#jxgboard_{$boardID}').css('border', '1px solid #0f0');
-				} else if ($('#qn{$box}, #tc{$box}').is('.ansred') || $('#qn{$box}, #tc{$box}').is('.ansyel')) {
-					$('#jxgboard_{$boardID}').css('border','1px solid #f00');
+					// if already red or yellow, make yellow, else make green
+					if ($('#jxgboard_{$boardID}').is('.ansred,.ansyel,.ansnoans')) {
+						$('#jxgboard_{$boardID}').removeClass('ansred').removeClass('ansnoans').addClass('ansyel');
+					} else {
+					 	$('#jxgboard_{$boardID}').addClass('ansgrn');
+					}
+				} else if ($('#qn{$box}, #tc{$box}').is('.ansred')) {
+					// if already grn or yellow, make yellow, else make red
+					if ($('#jxgboard_{$boardID}').is('.ansgrn,.ansyel')) {
+						$('#jxgboard_{$boardID}').removeClass('ansgrn').addClass('ansyel');
+					} else {
+					 	$('#jxgboard_{$boardID}').addClass('ansred');
+					}
+				} else if ($('#qn{$box}, #tc{$box}').is('.ansyel')) {
+					$('#jxgboard_{$boardID}').removeClass('ansgrn').removeClass('ansred').removeClass('ansnoans').addClass('ansyel');
+				} else {
+					if ($('#jxgboard_{$boardID}').is('.ansgrn,.ansyel')) {
+						$('#jxgboard_{$boardID}').removeClass('ansgrn').addClass('ansyel');
+					} else {
+						$('#jxgboard_{$boardID}').addClass('ansnoans');
+					}
 				}
 				/* Pull in answer from answerbox is possible */
 				if ($('#qn{$box}')[0] && $('#qn{$box}').val() !== '') {
@@ -2601,7 +2622,7 @@ function jsx_getcolorinterval($boardID, $box, $obj, $type, $param = array()) {
 				clearInterval(colorInterval{$boardID}_{$box});
 			}
 		}, 300);";
-		
+
 	return $out;
 }
 
